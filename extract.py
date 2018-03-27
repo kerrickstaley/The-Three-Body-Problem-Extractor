@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
+import argparse
+import subprocess
 import sys
+import tempfile
+
+parser = argparse.ArgumentParser(
+    description='Reformat text from a PDF copy of the novel The Three Body Problem (三体) by Cixin Liu')
+parser.add_argument('pdf_file', help='Path to PDF file')
 
 
 class State:
@@ -82,9 +89,26 @@ def process_line(line, state, desc):
     return rv
 
 
+def run_pdftotext(input_file):
+  output_file = tempfile.mktemp()
+
+  try:
+    subprocess.check_call(['pdftotext', '-layout', input_file, output_file])
+  except OSError as e:
+    if e.errno == 2:
+      print('Error: you need to install the program pdftotext', file=sys.stderr)
+    raise
+
+  return output_file
+
+
 if __name__ == '__main__':
+  args = parser.parse_args()
+
+  text_file = run_pdftotext(args.pdf_file)
+
   state = State()
-  for line in open('san_ti_1.txt'):
+  for line in open(text_file):
     txt = process_line(line, state, book1_description)
     if txt:
       print(txt, end='')

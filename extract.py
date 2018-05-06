@@ -76,7 +76,7 @@ def process_line(line, state, desc):
       raise Exception(f'even-page line with less than EVEN_INDENTATION: {line.strip()}')
     indentation -= EVEN_INDENTATION
 
-  if indentation == 0 or indentation > 4:
+  if indentation < 2 or indentation > 5:
     # continuation of current paragraph
     return line.strip()
   else:
